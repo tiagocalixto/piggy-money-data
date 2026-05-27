@@ -1,0 +1,1 @@
+notei que voce criou um sript unico com a criacao e a insercao de dados de demonstracao, poderia separar os scirpts em 01 criacao e 02 dados de demonstracao
