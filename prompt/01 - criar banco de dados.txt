@@ -1,0 +1,101 @@
+Você é um especialista em banco de dados. Gere um script SQL para MySQL 8.0+ que implemente um sistema de controle financeiro pessoal multiusuário. Regra fundamental: todas as tabelas terão a coluna usuario_id como chave estrangeira, e todas as consultas da aplicação sempre filtrarão por usuario_id primeiro. Portanto, todos os índices para performance devem começar com usuario_id.
+
+Estrutura exigida:
+Tabela usuario
+id (PK)
+
+email VARCHAR(255) – único, opcional mas pelo menos um contato deve existir
+
+telefone VARCHAR(20) – único, opcional
+
+nome VARCHAR(100)
+
+senha_hash VARCHAR(255)
+
+data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+Índice único em email e telefone (com tratamento de valores nulos – use unique index com condição ou lógica de aplicação)
+
+Tabelas com usuario_id (FK para usuario.id, ON DELETE CASCADE)
+conta
+
+Campos: id, usuario_id, nome, tipo, saldo_inicial
+
+Índice obrigatório: (usuario_id, nome) para buscas rápidas
+
+cartao_credito
+
+Campos: id, usuario_id, nome, limite_total, dia_fechamento, dia_vencimento, conta_id (FK para conta do mesmo usuário)
+
+Índice: (usuario_id, nome)
+
+cartao_beneficio
+
+Campos: id, usuario_id, nome, tipo (refeição/alimentação/outros), saldo_inicial
+
+Índice: (usuario_id, nome)
+
+categoria
+
+Campos: id, usuario_id, nome, tipo_permitido (entrada/saida/ambos)
+
+Categoria padrão: ao criar um usuário, deve existir uma categoria com nome "Outros" ou "Sem categoria" para ele.
+
+Índice: (usuario_id, nome)
+
+fatura_cartao
+
+Campos: id, usuario_id, cartao_credito_id, mes_referencia, ano_referencia, data_fechamento, data_vencimento, total_fatura, status (aberta/paga/parcial)
+
+Índices:
+
+(usuario_id, cartao_credito_id, status)
+
+(usuario_id, data_vencimento)
+
+transacao (tabela principal)
+
+Campos: id, usuario_id, descricao, valor, data, categoria_id, efetivada (bool), tipo_movimento (entrada/saida)
+
+Chaves estrangeiras opcionais (uma delas):
+
+conta_id (FK)
+
+cartao_credito_id (FK)
+
+cartao_beneficio_id (FK)
+
+Campos para parcelamento (qualquer despesa): parcelas_total, parcela_atual, transacao_original_id (self-FK)
+
+fatura_id (FK, quando for saída no cartão de crédito)
+
+Índices obrigatórios (todos começando com usuario_id):
+
+(usuario_id, categoria_id, data) – para consulta por categoria + período
+(usuario_id, conta_id, data) – para transações por conta + data
+(usuario_id, cartao_credito_id, data) – para transações por cartão de crédito + data
+(usuario_id, cartao_beneficio_id, data) – para transações por benefício + data
+(usuario_id, tipo_movimento, data) – para filtrar por entrada/saída + data
+(usuario_id, efetivada, data) – para buscar transações pendentes ou efetivadas
+Regras de negócio reforçadas:
+Limite do cartão de crédito: Disponível = limite_total - soma das compras não pagas (faturas abertas). O pagamento efetivado da fatura libera limite.
+
+Parcelamento: qualquer saída (conta, crédito, benefício) pode ter parcelas_total > 1. As parcelas são transações individuais ligadas pelo transacao_original_id.
+
+Pagamento da fatura: gerado automaticamente um dia após o fechamento como uma transação do tipo saida na conta corrente vinculada, com data = vencimento, efetivada = false. Ao ser efetivada, muda status da fatura para 'paga'.
+
+Transações futuras são permitidas (data > hoje). A flag efetivada controla se já ocorreu.
+
+Exemplo de dados:
+Insira um usuário de demonstração.
+
+Insira a categoria padrão para esse usuário.
+
+Insira uma conta, um cartão de crédito, um cartão benefício.
+
+Insira uma transação de entrada na conta, uma saída parcelada no cartão de crédito (2 parcelas), e uma fatura correspondente.
+
+Insira o pagamento da fatura como transação futura.
+
+Entregável:
+Um único script SQL válido, com CREATE TABLE, FOREIGN KEY, CREATE INDEX, e inserts de exemplo. Comentários explicando o papel de cada índice e as regras de limite/parcelamento.
