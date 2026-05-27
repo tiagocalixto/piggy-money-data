@@ -24,7 +24,7 @@ CREATE TABLE usuario (
     email        VARCHAR(255)  NULL,
     telefone     VARCHAR(20)   NULL,
     nome         VARCHAR(100)  NOT NULL,
-    senha_hash   VARCHAR(255)  NOT NULL,
+    senha_hash   VARCHAR(255)  NULL,
     data_criacao TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT pk_usuario PRIMARY KEY (id),

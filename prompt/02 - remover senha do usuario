@@ -1,0 +1,1 @@
+como o banco de dados ja esta criado, agora gostaria de remover a obrigatoriedade de uma senha para o usuario no primeiro momento, entao pode tornar o campo senha nullable
