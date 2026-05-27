@@ -1,0 +1,105 @@
+# 04 - Alterar Campo Saldo
+
+## Objetivo
+
+Alterar a modelagem financeira das tabelas `conta` e `cartao_beneficio` para substituir o campo `saldo_inicial` por um campo persistido chamado `saldo`, que representará o saldo atual da entidade.
+
+A responsabilidade de atualização do saldo passa a ser da aplicação (camada de serviços), sempre que transações forem criadas, alteradas ou removidas.
+
+---
+
+# Regras de Negócio
+
+## Contas (`conta`)
+
+### Alterações esperadas
+
+- Remover o campo `saldo_inicial`.
+- Adicionar o campo `saldo`.
+
+### Regra do saldo
+
+O campo `saldo` representa o saldo atual da conta e deverá ser atualizado pela aplicação após qualquer movimentação financeira.
+
+### Regra de migração
+
+O valor inicial do novo campo `saldo` deve seguir a seguinte prioridade:
+
+1. Se existirem transações efetivadas (`efetivada = true`):
+   - recalcular o saldo com base nessas transações.
+
+2. Se não existirem transações:
+   - utilizar o valor antigo de `saldo_inicial`.
+
+3. Se não houver transações e nem `saldo_inicial`:
+   - utilizar `0.00`.
+
+---
+
+## Cartões Benefício (`cartao_beneficio`)
+
+### Alterações esperadas
+
+- Remover o campo `saldo_inicial`.
+- Adicionar o campo `saldo`.
+
+### Regra do saldo
+
+O saldo do cartão benefício também passa a representar o valor atual disponível, sendo atualizado exclusivamente pela aplicação.
+
+A lógica de migração segue exatamente a mesma regra utilizada para `conta`.
+
+---
+
+# Requisitos Técnicos
+
+A IA deve gerar uma migration SQL compatível com MySQL 8.0+ que:
+
+1. Adicione a nova coluna `saldo` inicialmente permitindo `NULL`.
+2. Copie os valores existentes de `saldo_inicial`.
+3. Recalcule o saldo utilizando apenas transações efetivadas.
+4. Atualize registros sem movimentação utilizando o valor antigo de `saldo_inicial`.
+5. Defina `0.00` para registros sem movimentação e sem saldo anterior.
+6. Altere a coluna para `NOT NULL DEFAULT 0.00`.
+7. Remova a coluna antiga `saldo_inicial`.
+8. Não utilize triggers.
+9. Utilize comentários explicando cada etapa da migração.
+
+---
+
+# Regras para Recalcular Saldo
+
+A lógica de recálculo deve considerar:
+
+- transações do tipo `entrada` somam valor;
+- transações do tipo `saida` subtraem valor;
+- apenas transações com `efetivada = true` devem impactar o saldo.
+
+---
+
+# Justificativa Arquitetural
+
+A atualização de saldo será responsabilidade da camada de aplicação e não do banco de dados.
+
+Não utilizar triggers.
+
+Motivos:
+
+- centralização das regras de negócio no backend;
+- maior previsibilidade;
+- facilidade de testes;
+- menor acoplamento ao banco;
+- manutenção simplificada;
+- redução de efeitos colaterais ocultos.
+
+---
+
+# Entregável Esperado
+
+A IA deve gerar:
+
+- um único script SQL completo;
+- compatível com MySQL 8.0+;
+- totalmente comentado;
+- seguro para execução em ambiente já existente;
+- preparado para migração de dados históricos.

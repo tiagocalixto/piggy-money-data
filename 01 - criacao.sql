@@ -48,7 +48,7 @@ CREATE TABLE conta (
     usuario_id    INT            NOT NULL,
     nome          VARCHAR(100)   NOT NULL,
     tipo          VARCHAR(50)    NOT NULL,
-    saldo_inicial DECIMAL(15,2)  NOT NULL DEFAULT 0.00,
+    saldo DECIMAL(15,2)  NOT NULL DEFAULT 0.00,
 
     CONSTRAINT pk_conta PRIMARY KEY (id),
 
@@ -102,7 +102,7 @@ CREATE TABLE cartao_beneficio (
     usuario_id    INT            NOT NULL,
     nome          VARCHAR(100)   NOT NULL,
     tipo          ENUM('refeicao','alimentacao','outros') NOT NULL,
-    saldo_inicial DECIMAL(15,2)  NOT NULL DEFAULT 0.00,
+    saldo DECIMAL(15,2)  NOT NULL DEFAULT 0.00,
 
     CONSTRAINT pk_cartao_beneficio PRIMARY KEY (id),
 

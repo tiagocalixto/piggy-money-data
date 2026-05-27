@@ -35,7 +35,7 @@ INSERT INTO categoria (usuario_id, nome, tipo_permitido) VALUES
 -- ============================================================================
 -- 3. Conta corrente (saldo inicial de R$ 5.000,00)
 -- ============================================================================
-INSERT INTO conta (usuario_id, nome, tipo, saldo_inicial)
+INSERT INTO conta (usuario_id, nome, tipo, saldo)
 VALUES (@usuario_demo, 'Conta Corrente', 'corrente', 5000.00);
 
 SET @conta_corrente = LAST_INSERT_ID();
@@ -52,7 +52,7 @@ SET @cartao_principal = LAST_INSERT_ID();
 -- ============================================================================
 -- 5. Cartão benefício — vale-refeição (saldo inicial de R$ 500,00)
 -- ============================================================================
-INSERT INTO cartao_beneficio (usuario_id, nome, tipo, saldo_inicial)
+INSERT INTO cartao_beneficio (usuario_id, nome, tipo, saldo)
 VALUES (@usuario_demo, 'VR Empresa', 'refeicao', 500.00);
 
 SET @beneficio_vr = LAST_INSERT_ID();
